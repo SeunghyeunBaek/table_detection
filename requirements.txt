@@ -1,0 +1,4 @@
+numpy==1.18.3
+opencv-python==4.2.0.34
+Pillow==7.1.2
+tesserocr @ file:///C:/Users/wonca/Documents/ocr/whl/tesserocr-2.4.0-cp37-cp37m-win_amd64.whl
