@@ -1,4 +1,5 @@
 
+cell_img/
 sp_img/
 img/
 proc_img/
@@ -10,4 +11,6 @@ whl/
 .ipynb_checkpoints/
 __pycache__/
 *.swp
+*.jpg
+
 
