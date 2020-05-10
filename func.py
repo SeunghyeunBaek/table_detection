@@ -4,14 +4,11 @@ import copy
 
 ## functions
 
-def imshow(img, size=(15, 7)):
-    img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-    plt.figure(figsize=size)
-    plt.imshow(img)
-    plt.show()
-    return f'image size: {img.shape}'
-
-
+def imshow(img):
+    cv2.imshow('img', img)
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
+    
 # line
 
 def remove_line(img, row_img, col_img):
@@ -21,25 +18,35 @@ def remove_line(img, row_img, col_img):
     for row_id in range(row_img.shape[0]):
         for col_id in range(row_img.shape[1]):
             if row_img[row_id, col_id] == 0:
-                rm_line_img[row_id, col_id] = 255
+                rm_line_img[row_id, col_id-100: col_id + 100] = 255
             if col_img[row_id, col_id] == 0:
-                rm_line_img[row_id, col_id] = 255
+                rm_line_img[row_id-100: col_id+100, col_id] = 255
                 
     return rm_line_img
-
                 
-def get_box(img, white_back=False, margin=0, min_height=20, line_color=(255, 0, 0), line_width=2):
-    back_img = cv2.cvtColor(img, cv2.COLOR_GRAY2RGB)
-    if white_back:
-        back_img = 255
+def get_box(img, type, back_img, margin=0, min_height=20, min_width=20, line_color=(255, 0, 0), line_width=2):
+    
+#     if back_img != cv2.threshold(img, 255, 255, cv2.THRESH_BINARY):
+#         back_img = cv2.
     contour, hier = cv2.findContours(img, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
-    box_coord_ls = [-1 for i in range(len(contour))]
+    box_coord_ls = list()
     
     for cnt_id, cnt in enumerate(contour):
         x, y, w, h = cv2.boundingRect(cnt)
-        if (min_height < h < back_img.shape[0] - 10):
-            cv2.rectangle(back_img, (x, y), (x+w, y+h), line_color, line_width)
-        box_coord_ls[cnt_id] = (x, y, x+w, y+h)
+        if type=='row':
+            if (min_width < w < back_img.shape[1] - 10):
+                cv2.rectangle(back_img, (x, y), (x+w, y+h), line_color, line_width)
+                box_coord_ls.append((x, y, x+w, y+h))
+        elif type=='col':
+            if (min_height < h < back_img.shape[0] - 10):
+                cv2.rectangle(back_img, (x, y), (x+w, y+h), line_color, line_width)
+                box_coord_ls.append((x, y, x+w, y+h))
+        elif type=='box':
+            if (min_height < h):
+                cv2.rectangle(back_img, (x, y), (x+w, y+h), line_color, line_width)
+                box_coord_ls.append((x, y, x+w, y+h))
+        else:
+            pass
     
     res_dict = {
         'img': back_img
@@ -75,12 +82,12 @@ def get_cell(img, row_img, col_img, min_size=30):
         x, y, w, h = cv2.boundingRect(row_cnt)
         if w > min_size:
             yline_ls.append(y)
-            cv2.rectangle(back_img, (0, y), (img_w, y), (255, 0, 0), 10)
+            cv2.rectangle(back_img, (0, y), (img_w, y), (255, 0, 0), 2)
 
     for col_id, col_cnt in enumerate(col_contour):
         x, y, w, h = cv2.boundingRect(col_cnt)
         xline_ls.append(x)
-        cv2.rectangle(back_img, (x, 0), (x, img_h), (255, 0, 0), 10)
+        cv2.rectangle(back_img, (x, 0), (x, img_h), (255, 0, 0), 2)
 
     # 정렬
     xline_ls, yline_ls = sorted(xline_ls), sorted(yline_ls)

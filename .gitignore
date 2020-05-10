@@ -8,6 +8,7 @@ res/
 tool/
 venv/
 whl/
+res/
 .ipynb_checkpoints/
 __pycache__/
 *.swp
